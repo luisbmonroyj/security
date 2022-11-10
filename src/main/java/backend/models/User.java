@@ -1,4 +1,4 @@
-package models;
+package backend.models;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -15,20 +15,22 @@ public class User {
     private String email;
     private String address;
     private String phone;
+    private String username;
     private String password;
     @DBRef
     private Role idRole; 
     
-    public Usuario (String id,String lastname,String name,String email,String address,String phone,String password){
+    public Usuario (String id,String lastname,String name,String email,String address,String phone, String username,String password){
         this.id = id;
         this.lastname=lastname;
         this.name=name;
         this.email=email;
         this.address=address;
         this.phone=phone;
+        this.username = username;
         this.password=password;
     }
-    
+
     //gets
     public String getId(){ return this.id; }
 
@@ -41,6 +43,8 @@ public class User {
     public String getAddress(){ return this.address; }
 
     public String getPhone(){ return this.phone; }
+
+    public String getUsername(){ return this.username; }
 
     public String getPassword(){ return this.password; }
 
@@ -56,6 +60,8 @@ public class User {
     public void setAddress(String address){ this.address = address;}
 
     public void setPhone(String phone){ this.phone = phone;}
+
+    public void setUsername(String username){ this.username = username;}
 
     public void setPassword(String password){ this.password = password;}
 
