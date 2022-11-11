@@ -20,7 +20,7 @@ public class User {
     @DBRef
     private Role idRole; 
     
-    public Usuario (String id,String lastname,String name,String email,String address,String phone, String username,String password){
+    public User (String id,String lastname,String name,String email,String address,String phone, String username,String password){
         this.id = id;
         this.lastname=lastname;
         this.name=name;

@@ -14,7 +14,10 @@ public class AccessToRole {
     private Role idRole;
     @DBRef
     private Access idAccess;
-    
+
+    //void constructor
+    public AccessToRole(){}
+
     public AccessToRole(Role idRole, Access idAccess) {
         this.idRole = idRole;
         this.idAccess = idAccess;

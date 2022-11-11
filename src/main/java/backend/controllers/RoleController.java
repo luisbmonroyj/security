@@ -1,14 +1,15 @@
-package controllers;
+package backend.controllers;
 
 import backend.models.*;
 import backend.repositories.*;
+
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
 @CrossOrigin
 @RestController
 @RequestMapping("/role")
@@ -24,10 +25,10 @@ public class RoleController {
 
     @PostMapping()
     public Role create(@RequestBody Role newRole){
-        //Check if the role name does not exists 
-        Role test = myRoleRepo.getRolebyName(newRole.getName());
+        //Check if the role name does not exist
+        Role test = myRoleRepo.getRoleByName(newRole.getName());
         if (test!=null)
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Role already exists with id "+test.get_id());
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Role already exists with id "+test.getIdRole());
         else
             return this.myRoleRepo.save(newRole);
     }
@@ -40,7 +41,7 @@ public class RoleController {
             //check if the new role name is not used already
             Role test = myRoleRepo.getRoleByName(updateRole.getName());
             if (test!=null)
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Role already exists with id "+test.get_id());
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Role already exists with id "+test.getIdRole());
             else {
                 currentRole.setName(updateRole.getName());
                 currentRole.setDescription(updateRole.getDescription());
@@ -61,13 +62,13 @@ public class RoleController {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Role undefined cannot be deleted");
             else {
                 //get an instance of Role undefined
-                Role undefinedRole = this.myRoleRepo.getRolebyName("undefined");
+                Role undefinedRole = this.myRoleRepo.getRoleByName("undefined");
                 //make a list of users with the role to be deleted
-                List<User> usersTochange= this.myUserRepo.getUsersWithRole(currentRole.getIdRole());
-                if (usersTochange.size()>0) 
-                    for (User userToUndefined : usersTochange) {
-                        //change role to undefined to this users
-                        userToUndefined.setId_rol(undefinedRole);
+                List<User> usersToChange= this.myUserRepo.getUsersWithRole(currentRole.getIdRole());
+                if (usersToChange.size()>0)
+                    for (User userToUndefined : usersToChange) {
+                        //change role to -undefined- to this users
+                        userToUndefined.setIdRole(undefinedRole);
                         this.myUserRepo.save(userToUndefined);
                     }
                 //now I can delete the role

@@ -1,14 +1,18 @@
-package controllers;
+package backend.controllers;
 
 import backend.models.*;
 import backend.repositories.*;
+
+import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.List;
 
 @CrossOrigin
 @RestController
@@ -25,7 +29,7 @@ public class UserController {
 
     @PostMapping()
     public User create(@RequestBody User newUser){
-        //Check if the username does not exists 
+        //Check if the username does not exist
         User test = myUserRepo.getUsername(newUser.getUsername());
         if (test!=null)
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");// with id "+test.get_id());
@@ -69,7 +73,18 @@ public class UserController {
         else 
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The user you are trying to delete does not exist");
     }
-
+    @PostMapping("/validate")
+    public User validate(@RequestBody User infoUser,final HttpServletResponse response) throws IOException {
+        User currentUser=this.myUserRepo.getUsername(infoUser.getUsername());
+        if (currentUser!=null && currentUser.getPassword().equals(encryptSHA256(infoUser.getPassword()))) {
+            currentUser.setPassword("");
+            return currentUser;
+        }
+        else{
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return null;
+        }
+    }
     @PutMapping()
     public User setRoleToUser(@RequestParam String id, @RequestParam String idRole){
         User currentUser = this.myUserRepo.findById(id).orElseThrow(RuntimeException::new);
@@ -82,23 +97,23 @@ public class UserController {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Role does not exist");
             //if role exists, assign it to the user
             else
-                currentUser.setId_rol(currentRole);
+                currentUser.setIdRole(currentRole);
         }
         return this.myUserRepo.save(currentUser);
     }
 
     public String encryptSHA256(String password) {
-        MessageDigest md = null;
-        try { md = MessageDigest.getInstance("SHA-256"); } 
+        MessageDigest msgDgst;
+        try { msgDgst = MessageDigest.getInstance("SHA-256"); } 
         catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
             return null;
         }
-        byte[] hash = md.digest(password.getBytes());
-        StringBuffer sb = new StringBuffer();
-        for (byte b : hash) 
-            sb.append(String.format("%02x", b));
-        return sb.toString();
+        byte[] msgBytes = msgDgst.digest(password.getBytes());
+        StringBuffer buffer = new StringBuffer();
+        for (byte b : msgBytes) 
+            buffer.append(String.format("%02x", b));
+        return buffer.toString();
     }
     
 }
